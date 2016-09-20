@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@android:style/Theme.NoTitleBar.Fullscreen"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/plug"
+    android:background="@drawable/plugroom1">
+
+    <include
+        android:id="@+id/smart_connect_config_header_view"
+        layout="@layout/smartconnect_headerlayout" />
+
+
+    <RelativeLayout
+        android:id="@+id/relativeLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/config_footerview"
+        android:layout_below="@+id/cofig_topbarRootview"
+        android:layout_marginLeft="@dimen/max_margin_size"
+        android:layout_marginRight="@dimen/max_margin_size">
+
+        <!--Button
+            android:id="@+id/config_sync_time"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:background="@drawable/btn_selector"
+            android:minHeight="@dimen/header_height"
+            android:text="@string/time_label"
+            android:textColor="@color/white" / -->
+
+        <ProgressBar
+            android:id="@+id/config_progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="@dimen/min_margin_cutoff"
+            android:indeterminateDrawable="@drawable/progress_drawable"
+            android:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/ic_https_black_48dp"
+            android:layout_marginBottom="38dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true" />
+
+        <!--Switch
+            android:id="@+id/mySwitch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/config_sync_time"
+            android:layout_alignLeft="@+id/imageView"
+            android:layout_alignStart="@+id/imageView"
+            android:layout_below="@+id/imageView"
+            android:textColor="@color/blue_text_color"
+            android:textOff="@string/elockon"
+            android:textOn="@string/elockoff" /-->
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/config_footerview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/top_header_bg">
+
+        <TextView
+            android:id="@+id/TextView01"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="www.atmel.com"
+            android:textColor="@color/black"
+            android:textColorLink="@color/grey_text_color"
+            android:textSize="@dimen/rowitem_text_size"
+            android:textStyle="bold" />
+
+    </RelativeLayout>
+</RelativeLayout>

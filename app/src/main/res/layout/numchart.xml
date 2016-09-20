@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:id="@+id/relativeLayout1"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/button_scan"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:singleLine="true"
+                android:text="@string/scan_node"
+                android:textColor="#fff"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/relativeLayout2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/relativeLayout1">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_alignParentBottom="true"
+            android:gravity="center"
+            android:text="www.atmel.com"/>
+
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/relativeLayout3"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignRight="@id/relativeLayout2"
+        android:layout_below="@id/relativeLayout1">
+
+        <TextView
+            android:id="@+id/editText_temp"
+            android:layout_width="100dp"
+            android:layout_height="40dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:gravity="center_vertical"
+            android:layout_marginTop="30dp"
+            android:text="1.000"/>
+
+        <TextView
+            android:id="@+id/textView_temp"
+            android:layout_width="100dp"
+            android:layout_height="40dp"
+            android:layout_alignBottom="@+id/editText_temp"
+            android:layout_toLeftOf="@+id/editText_temp"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:gravity="center_vertical"
+            android:text="Temperature" />
+
+        <TextView
+            android:id="@+id/editText_humi"
+            android:layout_width="100dp"
+            android:layout_height="40dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:gravity="center_vertical"
+            android:layout_marginTop="70dp"
+            android:text="1.000"/>
+
+        <TextView
+            android:id="@+id/textView_humi"
+            android:layout_width="100dp"
+            android:layout_height="40dp"
+            android:layout_alignBottom="@+id/editText_humi"
+            android:layout_toLeftOf="@+id/editText_humi"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:gravity="center_vertical"
+            android:text="Humidity" />
+
+        <TextView
+            android:id="@+id/editText_pres"
+            android:layout_width="100dp"
+            android:layout_height="40dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:gravity="center_vertical"
+            android:layout_marginTop="110dp"
+            android:text="1.000"/>
+
+        <TextView
+            android:id="@+id/textView_pres"
+            android:layout_width="100dp"
+            android:layout_height="40dp"
+            android:layout_alignBottom="@+id/editText_pres"
+            android:layout_toLeftOf="@+id/editText_pres"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:gravity="center_vertical"
+            android:text="Pressure" />
+
+        <TextView
+            android:id="@+id/editText_dust"
+            android:layout_width="100dp"
+            android:layout_height="40dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:gravity="center_vertical"
+            android:layout_marginTop="150dp"
+            android:text="1.000"/>
+
+        <TextView
+            android:id="@+id/textView_dust"
+            android:layout_width="100dp"
+            android:layout_height="40dp"
+            android:layout_alignBottom="@+id/editText_dust"
+            android:layout_toLeftOf="@+id/editText_dust"
+            android:gravity="center_vertical"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:text="Dust" />
+
+        <TextView
+            android:id="@+id/editText_air_co2"
+            android:layout_width="100dp"
+            android:layout_height="40dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:gravity="center_vertical"
+            android:layout_marginTop="190dp"
+            android:text="1.000"/>
+
+        <TextView
+            android:id="@+id/textView_air_co2"
+            android:layout_width="100dp"
+            android:layout_height="40dp"
+            android:layout_alignBottom="@+id/editText_air_co2"
+            android:layout_toLeftOf="@+id/editText_air_co2"
+            android:gravity="center_vertical"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:text="Air_co2" />
+
+        <TextView
+            android:id="@+id/editText_air_voc"
+            android:layout_width="100dp"
+            android:layout_height="40dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:gravity="center_vertical"
+            android:layout_marginTop="230dp"
+            android:text="1.000%"/>
+
+        <TextView
+            android:id="@+id/textView_air_voc"
+            android:layout_width="100dp"
+            android:layout_height="40dp"
+            android:layout_alignBottom="@+id/editText_air_voc"
+            android:layout_toLeftOf="@+id/editText_air_voc"
+            android:gravity="center_vertical"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:text="Air_voc" />
+
+        <TextView
+            android:id="@+id/editText_noise"
+            android:layout_width="100dp"
+            android:layout_height="40dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:gravity="center_vertical"
+            android:layout_marginTop="270dp"
+            android:text="1.000%"/>
+
+        <TextView
+            android:id="@+id/textView_noise"
+            android:layout_width="100dp"
+            android:layout_height="40dp"
+            android:layout_alignBottom="@+id/editText_noise"
+            android:layout_toLeftOf="@+id/editText_noise"
+            android:gravity="center_vertical"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:text="Noise" />
+
+
+        <ImageView
+            android:layout_width="72dp"
+            android:layout_height="36dp"
+            android:layout_marginLeft="48dp"
+            android:id="@+id/imageView1"
+            android:layout_alignTop="@+id/textView_temp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="false"
+            android:src="@drawable/ic_wb_incandescent_grey600_48dp"
+            android:focusable="true" />
+        <ImageView
+            android:layout_width="72dp"
+            android:layout_height="36dp"
+            android:layout_marginLeft="48dp"
+            android:id="@+id/imageView2"
+            android:layout_alignTop="@+id/textView_humi"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="false"
+            android:src="@drawable/ic_cloud_queue_grey600_48dp"
+            android:focusable="true" />
+
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="400dp"
+            android:layout_marginLeft="48dp"
+            android:id="@+id/imageView3"
+            android:src="@drawable/miss1"
+            android:layout_below="@+id/textView_air_voc" />
+
+        <!--LinearLayout
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_below="@+id/editText_noise"
+            android:layout_toRightOf="@+id/imageView3"
+            android:layout_marginRight="20dp"
+            android:weightSum="1">
+
+            <Button
+                android:layout_width="220dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+
+                android:text="Air Quality"
+                android:id="@+id/button"
+                android:background="@color/grey_text_color"
+                android:textAlignment="center" />
+
+            <TextView
+                android:layout_width="220dp"
+                android:layout_height="68dp"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="NA"
+                android:id="@+id/textView2"
+                android:gravity="center"
+                android:background="@color/white"
+                android:textColor="#ff2442ff"
+                android:textSize="40dip"
+                android:typeface= "sans"
+                android:textStyle="bold"
+                android:textAlignment="center" />
+        </LinearLayout -->
+
+    </RelativeLayout>
+
+</RelativeLayout>
