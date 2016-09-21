@@ -129,7 +129,7 @@ public class ChartDemo extends Activity {
                     intent.putExtra("dataSource", dataSource);
                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent);
-                } else*/ if (productType.equals("5")) {
+                } else*/ if (productType.equals("2")) {
                     Intent intent = new Intent(ChartDemo.this, PlugActivity.class);
                     intent.putExtra("dataSource", dataSource);
                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -232,9 +232,9 @@ public class ChartDemo extends Activity {
                                 item_details.setImageNumber(1);
                             }
                             if (packet.getData()[1] == 2) {
-                                item_details.setItemDescription("E-lock");
+                                item_details.setItemDescription("air conditon");
                                 if (packet.getData()[11] == 2) {
-                                    item_details.setPrice("Location: office");
+                                    item_details.setPrice("camera&temperature");
                                 } else if (packet.getData()[11] == 3){
                                     item_details.setPrice("Location: toilet");
                                 }

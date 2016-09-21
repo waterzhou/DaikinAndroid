@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Daikin air conditioner</string>
+    <string name="app_name">Daikin IoT</string>
 	<string name="add_values">Add values to the chart</string>    
 	<string name="x">X</string>    
 	<string name="y">Y</string>

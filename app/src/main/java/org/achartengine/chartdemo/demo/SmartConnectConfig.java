@@ -31,7 +31,6 @@ import org.achartengine.chartdemo.demo.task.__IEsptouchTask;
 import org.achartengine.chartdemo.demo.utils.IEsptouchListener;
 import org.achartengine.chartdemo.demo.utils.IEsptouchResult;
 import org.achartengine.chartdemo.demo.utils.IEsptouchTask;
-import org.achartengine.chartdemo.demo.utils.SmartConnectDialogManager;
 import org.achartengine.chartdemo.demo.utils.SmartConnectUtils;
 import org.achartengine.chartdemo.demo.utils.SmartConnectWifiManager;
 
@@ -79,8 +78,6 @@ public class SmartConnectConfig extends Activity implements View.OnClickListener
     /**
      * A Dialog instance which is responsible to generate all dialogs in the app
      */
-    private SmartConnectDialogManager mDialogManager = null;
-    private ProgressDialog pd_config_refresh;
     private static AppPreferences mAppPreferences;
 
     private boolean eye = false;
@@ -108,17 +105,7 @@ public class SmartConnectConfig extends Activity implements View.OnClickListener
 
     }
 
-    class SpinnerSelectedListener implements AdapterView.OnItemSelectedListener {
 
-        public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2,
-                                   long arg3) {
-
-            mAppPreferences.setBridgeWiFiSSID(arg0.getItemAtPosition(arg2).toString());
-        }
-
-        public void onNothingSelected(AdapterView<?> arg0) {
-        }
-    }
     @Override
     public void onResume() {
         super.onResume();
@@ -150,7 +137,6 @@ public class SmartConnectConfig extends Activity implements View.OnClickListener
         ivEye.setImageResource(R.drawable.w22);
         mPasswordInputField.setInputType(InputType.TYPE_CLASS_TEXT
                 | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        //mconfigProgress = (ProgressBar) findViewById(R.id.config_progress);
     }
 
     /**
@@ -235,33 +221,7 @@ public class SmartConnectConfig extends Activity implements View.OnClickListener
         }
     }
 
-    private void dismissProcessDialog() {
-        runOnUiThread(new Runnable() {
-            public void run() {
-                if (pd_config_refresh != null) {
-                    pd_config_refresh.dismiss();
-                }
-                pd_config_refresh = null;
-            }
-        });
-    }
 
-    /*Show process dialog*/
-    private void showProcessDialog(final int progress) {
-        runOnUiThread(new Runnable() {
-            public void run() {
-                if (pd_config_refresh == null) {
-                    pd_config_refresh = new ProgressDialog(SmartConnectConfig.this);
-                }
-                pd_config_refresh.setMessage("Smart Configuring...");
-                pd_config_refresh.setCancelable(false);
-                pd_config_refresh.setProgress(progress);
-                pd_config_refresh.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-                pd_config_refresh.setMax(100);
-                pd_config_refresh.show();
-            }
-        });
-    }
 
 
     /**
@@ -441,8 +401,7 @@ public class SmartConnectConfig extends Activity implements View.OnClickListener
         protected void onPostExecute(List<IEsptouchResult> result) {
             mProgressDialog.getButton(DialogInterface.BUTTON_POSITIVE)
                     .setEnabled(true);
-            mProgressDialog.getButton(DialogInterface.BUTTON_POSITIVE).setText(
-                    "Confirm");
+            mProgressDialog.getButton(DialogInterface.BUTTON_POSITIVE).setText("Confirm");
             IEsptouchResult firstResult = result.get(0);
             // check whether the task is cancelled and no results received
             if (!firstResult.isCancelled()) {
@@ -455,7 +414,7 @@ public class SmartConnectConfig extends Activity implements View.OnClickListener
                 if (firstResult.isSuc()) {
                     StringBuilder sb = new StringBuilder();
                     for (IEsptouchResult resultInList : result) {
-                        sb.append("Esptouch success, bssid = "
+                        sb.append("Config success, bssid = "
                                 + resultInList.getBssid()
                                 + ",InetAddress = "
                                 + resultInList.getInetAddress()
@@ -470,6 +429,17 @@ public class SmartConnectConfig extends Activity implements View.OnClickListener
                                 + " more result(s) without showing\n");
                     }
                     mProgressDialog.setMessage(sb.toString());
+                    mProgressDialog.setButton(DialogInterface.BUTTON_POSITIVE,
+                            "Confirm", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    Log.i(TAG, "Confirm is pressed");
+                                    Intent Search_Activity = new Intent(SmartConnectConfig.this, ChartDemo.class);
+                                    Search_Activity.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                    startActivity(Search_Activity);
+                                    finish();
+                                }
+                            });
                 } else {
                     mProgressDialog.setMessage("Esptouch fail");
                 }
