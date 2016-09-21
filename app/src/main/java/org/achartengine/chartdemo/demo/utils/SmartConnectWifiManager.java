@@ -64,6 +64,14 @@ public class SmartConnectWifiManager {
         return removeSSIDQuotes(mWifiManager.getConnectionInfo().getSSID());
     }
 
+    public String getWifiConnectedBssid() {
+        WifiInfo mWifiInfo = getWifiInfo();
+        String bssid = null;
+        if (mWifiInfo != null && isWifiConnected()) {
+            bssid = mWifiInfo.getBSSID();
+        }
+        return bssid;
+    }
     /**
      * method to check wifi
      *

@@ -11,6 +11,7 @@ import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
@@ -24,10 +25,17 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
+import org.achartengine.chartdemo.demo.task.__IEsptouchTask;
+import org.achartengine.chartdemo.demo.utils.IEsptouchListener;
+import org.achartengine.chartdemo.demo.utils.IEsptouchResult;
+import org.achartengine.chartdemo.demo.utils.IEsptouchTask;
 import org.achartengine.chartdemo.demo.utils.SmartConnectDialogManager;
 import org.achartengine.chartdemo.demo.utils.SmartConnectUtils;
 import org.achartengine.chartdemo.demo.utils.SmartConnectWifiManager;
+
+import java.util.List;
 
 
 /**
@@ -190,11 +198,15 @@ public class SmartConnectConfig extends Activity implements View.OnClickListener
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.config_start_button: {
-                mAppPreferences.setRouterWiFiSSID(mSSIDInputField.getText().toString());
-                mAppPreferences.setRouterWiFiKey(mPasswordInputField.getText().toString());
-                Log.d(TAG, "ssid=" + mSSIDInputField.getText().toString() + "password=" + mPasswordInputField.getText().toString());
-                /*new EsptouchAsyncTask3().execute(apSsid, apBssid, apPassword,
-                        isSsidHiddenStr, taskResultCountStr);*/
+                String apSsid = mSSIDInputField.getText().toString();
+                String apPassword = mPasswordInputField.getText().toString();
+                String apBssid = getWiFiManagerInstance().getWifiConnectedBssid();
+                String isSsidHiddenStr = "NO";
+                mAppPreferences.setRouterWiFiSSID(apSsid);
+                mAppPreferences.setRouterWiFiKey(apPassword);
+                Log.d(TAG, "ssid=" + apSsid + "password=" + apPassword);
+                new EsptouchAsyncTask3().execute(apSsid, apBssid, apPassword,
+                        isSsidHiddenStr, "1");
                 break;
             }
             case R.id.config_change_button: {
@@ -251,68 +263,6 @@ public class SmartConnectConfig extends Activity implements View.OnClickListener
         });
     }
 
-
-
-
-   /* private void prompt_confirm_dialog(String text) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this)
-                .setIcon(android.R.drawable.ic_dialog_info)
-                .setMessage(text);
-
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog,
-                                int which) {
-                Intent Search_Activity = new Intent(SmartConnectConfig.this, ChartDemo.class);
-                Search_Activity.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(Search_Activity);
-                finish();
-            }
-        });
-
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog,
-                                int which) {
-
-                System.exit(0);
-            }
-        })
-                .create()
-                .show();
-    }
-*/
-
-    /**
-     * Show timeout alert
-     */
-    private void showConnectionTimedOut(int dialogType) {
-        if (mDialogManager == null) {
-            mDialogManager = new SmartConnectDialogManager(SmartConnectConfig.this);
-        }
-        mDialogManager.showCustomAlertDialog(dialogType);
-    }
-
-    /**
-     * Show Failure alert
-     */
-    private void showFailureAlert(int dialogType) {
-        if (mDialogManager == null) {
-            mDialogManager = new SmartConnectDialogManager(SmartConnectConfig.this);
-        }
-        mDialogManager.showCustomAlertDialog(dialogType);
-    }
-
-    /**
-     * Throws an alert to user stating the success message recieved after
-     * configuration
-     */
-    private void showConnectionSuccess(int dialogType) {
-        if (mDialogManager == null) {
-            mDialogManager = new SmartConnectDialogManager(SmartConnectConfig.this);
-        }
-        mDialogManager.showCustomAlertDialog(dialogType);
-    }
 
     /**
      * Default listener for checkbox the encrypted key is enabled or disabled
@@ -402,4 +352,128 @@ public class SmartConnectConfig extends Activity implements View.OnClickListener
             }
         }
     };
+
+    private void onEsptoucResultAddedPerform(final IEsptouchResult result) {
+        runOnUiThread(new Runnable() {
+
+            @Override
+            public void run() {
+                String text = result.getBssid() + " is connected to the wifi";
+                Toast.makeText(SmartConnectConfig.this, text,
+                        Toast.LENGTH_LONG).show();
+            }
+
+        });
+    }
+    private IEsptouchListener myListener = new IEsptouchListener() {
+
+        @Override
+        public void onEsptouchResultAdded(final IEsptouchResult result) {
+            onEsptoucResultAddedPerform(result);
+        }
+    };
+    private class EsptouchAsyncTask3 extends AsyncTask<String, Void, List<IEsptouchResult>> {
+
+        private ProgressDialog mProgressDialog;
+
+        private IEsptouchTask mEsptouchTask;
+        // without the lock, if the user tap confirm and cancel quickly enough,
+        // the bug will arise. the reason is follows:
+        // 0. task is starting created, but not finished
+        // 1. the task is cancel for the task hasn't been created, it do nothing
+        // 2. task is created
+        // 3. Oops, the task should be cancelled, but it is running
+        private final Object mLock = new Object();
+
+        @Override
+        protected void onPreExecute() {
+            mProgressDialog = new ProgressDialog(SmartConnectConfig.this);
+            mProgressDialog
+                    .setMessage("Esptouch is configuring, please wait for a moment...");
+            mProgressDialog.setCanceledOnTouchOutside(false);
+            mProgressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                @Override
+                public void onCancel(DialogInterface dialog) {
+                    synchronized (mLock) {
+                        if (__IEsptouchTask.DEBUG) {
+                            Log.i(TAG, "progress dialog is canceled");
+                        }
+                        if (mEsptouchTask != null) {
+                            mEsptouchTask.interrupt();
+                        }
+                    }
+                }
+            });
+            mProgressDialog.setButton(DialogInterface.BUTTON_POSITIVE,
+                    "Waiting...", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                        }
+                    });
+            mProgressDialog.show();
+            mProgressDialog.getButton(DialogInterface.BUTTON_POSITIVE)
+                    .setEnabled(false);
+        }
+
+        @Override
+        protected List<IEsptouchResult> doInBackground(String... params) {
+            int taskResultCount = -1;
+            synchronized (mLock) {
+                String apSsid = params[0];
+                String apBssid = params[1];
+                String apPassword = params[2];
+                String isSsidHiddenStr = params[3];
+                String taskResultCountStr = params[4];
+                boolean isSsidHidden = false;
+                if (isSsidHiddenStr.equals("YES")) {
+                    isSsidHidden = true;
+                }
+                taskResultCount = Integer.parseInt(taskResultCountStr);
+                mEsptouchTask = new EsptouchTask(apSsid, apBssid, apPassword,
+                        isSsidHidden, SmartConnectConfig.this);
+                mEsptouchTask.setEsptouchListener(myListener);
+            }
+            List<IEsptouchResult> resultList = mEsptouchTask.executeForResults(taskResultCount);
+            return resultList;
+        }
+
+        @Override
+        protected void onPostExecute(List<IEsptouchResult> result) {
+            mProgressDialog.getButton(DialogInterface.BUTTON_POSITIVE)
+                    .setEnabled(true);
+            mProgressDialog.getButton(DialogInterface.BUTTON_POSITIVE).setText(
+                    "Confirm");
+            IEsptouchResult firstResult = result.get(0);
+            // check whether the task is cancelled and no results received
+            if (!firstResult.isCancelled()) {
+                int count = 0;
+                // max results to be displayed, if it is more than maxDisplayCount,
+                // just show the count of redundant ones
+                final int maxDisplayCount = 5;
+                // the task received some results including cancelled while
+                // executing before receiving enough results
+                if (firstResult.isSuc()) {
+                    StringBuilder sb = new StringBuilder();
+                    for (IEsptouchResult resultInList : result) {
+                        sb.append("Esptouch success, bssid = "
+                                + resultInList.getBssid()
+                                + ",InetAddress = "
+                                + resultInList.getInetAddress()
+                                .getHostAddress() + "\n");
+                        count++;
+                        if (count >= maxDisplayCount) {
+                            break;
+                        }
+                    }
+                    if (count < result.size()) {
+                        sb.append("\nthere's " + (result.size() - count)
+                                + " more result(s) without showing\n");
+                    }
+                    mProgressDialog.setMessage(sb.toString());
+                } else {
+                    mProgressDialog.setMessage("Esptouch fail");
+                }
+            }
+        }
+    }
 }
