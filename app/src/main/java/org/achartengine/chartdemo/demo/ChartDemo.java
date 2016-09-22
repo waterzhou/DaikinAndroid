@@ -307,8 +307,8 @@ public class ChartDemo extends Activity {
     }
     @Override
     protected void onStop() {
-        udpBroadcast.close();
         mHandler.removeMessages(START_SEARCH);
+        udpBroadcast.close();
         super.onStop();
     }
 

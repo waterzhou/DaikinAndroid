@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.PrintWriter;
@@ -31,10 +32,10 @@ public class PlugActivity extends Activity implements View.OnClickListener{
     private Socket socket;
     private Integer SERVERPORT = 8899;
     private SimpleDateFormat mDateFormat;
-    private Button mSyncTimeButton;
+    private Button mButtonGetPicture;
+    private Button mButtonGetTemperature;
     private Button mAdduserButton;
-    //private Button mLockButton;
-    private Switch mSwitch;
+
     private EditText mUserInputField;
     private EditText mPasswordInputField;
     private ImageView mLockStatus;
@@ -49,26 +50,27 @@ public class PlugActivity extends Activity implements View.OnClickListener{
     private static final int START_GETPLUGSTATUS = 0x2000;
     private static final int DELAY = 2000;
     private boolean mPlugStatus = false;
-    private String mClockname;
-    private String mClockPassword;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.plugactivity);
-
         Bundle bundle = this.getIntent().getExtras();
         dataSource = bundle.getString("dataSource");
         final TextView IpText = (TextView) findViewById(R.id.TextView01);
         mAppPreferences = new AppPreferences(getApplicationContext());
         SERVER_IP = mAppPreferences.getParameter(dataSource);
+        Log.i(TAG, "server ip is " + SERVER_IP);
         IpText.setText(SERVER_IP);
-        mDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-        // mSyncTimeButton = (Button) findViewById(R.id.config_sync_time);
+        mButtonGetPicture = (Button) findViewById(R.id.ButtonGetPicture);
+        mButtonGetTemperature = (Button) findViewById(R.id.ButtonGetTemperature);
+        mButtonGetPicture.setOnClickListener(this);
+        mButtonGetTemperature.setOnClickListener(this);
 
-        mLockStatus= (ImageView) findViewById(R.id.imageView);
-        mLockStatus.setOnClickListener(this);
+/*        mLockStatus= (ImageView) findViewById(R.id.imageView);
+        mLockStatus.setOnClickListener(this);*/
 
         mHandler = new Handler() {
             public void handleMessage(android.os.Message msg) {
@@ -84,7 +86,7 @@ public class PlugActivity extends Activity implements View.OnClickListener{
             }
         };
         new connectTask().execute("");
-        startGetPlugStatus();
+        //startGetPlugStatus();
     }
     private void startGetPlugStatus() {
         mHandler.sendEmptyMessageDelayed(START_GETPLUGSTATUS,DELAY);
@@ -92,12 +94,15 @@ public class PlugActivity extends Activity implements View.OnClickListener{
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.imageView: {
+            case R.id.ButtonGetPicture: {
                 if (mTcpClient != null) {
-                    if (mPlugStatus)
-                        mTcpClient.sendMessage("AT+CLOSE");
-                    else
-                        mTcpClient.sendMessage("AT+OPEN");
+                    mTcpClient.sendMessage("get temperature");
+                }
+                break;
+            }
+            case R.id.ButtonGetTemperature:{
+                if (mTcpClient != null) {
+                    mTcpClient.sendMessage("get temperature");
                 }
                 break;
             }
@@ -144,7 +149,7 @@ public class PlugActivity extends Activity implements View.OnClickListener{
             }
 
             //in the arrayList we add the messaged received from server
-           // Toast.makeText(PlugActivity.this, values[0], Toast.LENGTH_SHORT).show();
+           Toast.makeText(PlugActivity.this, values[0], Toast.LENGTH_SHORT).show();
             // notify the adapter that the data set has changed. This means that new message received
             // from server was added to the list
         }

@@ -10,7 +10,7 @@
     <string name="str_tv_title">Person weather station</string>
     <string name="menu_about">About</string>
     <string name="menu_pws_title">Add personal weather station</string>
-    <string name="menu_edge_title">Add wifi node</string>
+    <string name="menu_edge_title">Smart Configure</string>
     <string name="menu_sc_tile">Add smart lock</string>
     <string name="config_title">Device Configuration</string>
     <string name="ssid_label">SSID</string>

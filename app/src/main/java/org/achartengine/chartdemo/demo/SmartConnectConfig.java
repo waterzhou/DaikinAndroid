@@ -115,6 +115,7 @@ public class SmartConnectConfig extends Activity implements View.OnClickListener
     @Override
     public void onStop() {
         super.onStop();
+        Log.d(TAG, "smartconfig stop---------------------------");
         if (broadcastReceiver != null) {
             // Unregister receiver.
             unregisterReceiver(broadcastReceiver);
@@ -412,7 +413,11 @@ public class SmartConnectConfig extends Activity implements View.OnClickListener
                 // the task received some results including cancelled while
                 // executing before receiving enough results
                 if (firstResult.isSuc()) {
-                    StringBuilder sb = new StringBuilder();
+                    Intent Search_Activity = new Intent(SmartConnectConfig.this, ChartDemo.class);
+                    Search_Activity.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(Search_Activity);
+                    finish();
+                    /*StringBuilder sb = new StringBuilder();
                     for (IEsptouchResult resultInList : result) {
                         sb.append("Config success, bssid = "
                                 + resultInList.getBssid()
@@ -439,7 +444,7 @@ public class SmartConnectConfig extends Activity implements View.OnClickListener
                                     startActivity(Search_Activity);
                                     finish();
                                 }
-                            });
+                            });*/
                 } else {
                     mProgressDialog.setMessage("Esptouch fail");
                 }
