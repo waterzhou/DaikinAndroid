@@ -4,6 +4,9 @@ import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -13,6 +16,8 @@ import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.achartengine.chartdemo.demo.utils.SmartConnectContants;
 
 import java.io.BufferedReader;
 import java.io.PrintWriter;
@@ -25,7 +30,6 @@ import java.text.SimpleDateFormat;
 public class PlugActivity extends Activity implements View.OnClickListener{
     private static final String TAG = "Plug";
     private String dataSource;
-    private Handler mHandler;
     private udpbroadcast udpBroadcast = null;
     private static AppPreferences mAppPreferences;
     private String SERVER_IP = null;
@@ -43,15 +47,32 @@ public class PlugActivity extends Activity implements View.OnClickListener{
     private PrintWriter mBufferOut;
     // used to read messages from the server
     private BufferedReader mBufferIn;
-    // while this is true, the server will continue running
-    private boolean mRun = false;
-    private String mServerMessage;
     private TCPClient mTcpClient;
     private static final int START_GETPLUGSTATUS = 0x2000;
     private static final int DELAY = 2000;
+    private static ConnectionHandler mConnectionHandler;
+
+    private HandlerThread mConnectionThread;
     private boolean mPlugStatus = false;
+    private boolean mBoolGetpicture = false;
+    private boolean mBoolGettemperature = false;
+
+    class ConnectionHandler extends Handler {
+        public ConnectionHandler(Looper looper) {
+            super(looper);
+        }
+        @Override
+        public void handleMessage(Message message) {
+            switch (message.what) {
+                case SmartConnectContants.MSG_GET_PICTURE:
+                {
 
 
+                    break;
+                }
+            }
+        }
+    }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,45 +90,70 @@ public class PlugActivity extends Activity implements View.OnClickListener{
         mButtonGetPicture.setOnClickListener(this);
         mButtonGetTemperature.setOnClickListener(this);
 
+        // Start another thread to solve different tasks
+        mConnectionThread = new HandlerThread("ConnectionThread");
+        mConnectionThread.start();
+        mConnectionHandler = new ConnectionHandler(mConnectionThread.getLooper());
 /*        mLockStatus= (ImageView) findViewById(R.id.imageView);
         mLockStatus.setOnClickListener(this);*/
 
-        mHandler = new Handler() {
-            public void handleMessage(android.os.Message msg) {
-                switch (msg.what) {
-                    case START_GETPLUGSTATUS: {
-                        if (mTcpClient != null) {
-                            mTcpClient.sendMessage("AT+QUERY");
-                        }
-                        startGetPlugStatus();
-                        break;
-                    }
-                }
-            }
-        };
         new connectTask().execute("");
         //startGetPlugStatus();
     }
-    private void startGetPlugStatus() {
-        mHandler.sendEmptyMessageDelayed(START_GETPLUGSTATUS,DELAY);
-    }
+
+    private Handler  mHandler = new Handler() {
+        public void handleMessage(android.os.Message msg) {
+            switch (msg.what) {
+                case SmartConnectContants.UPDATE_UI_BUTTON: {
+                    if (mBoolGetpicture) {
+                        mButtonGetPicture.setEnabled(false);
+                        mButtonGetPicture.getBackground().setAlpha(150);
+                    }
+                    if (mBoolGettemperature) {
+                        mButtonGetTemperature.setEnabled(false);
+                        mButtonGetTemperature.getBackground().setAlpha(150);
+                    }
+                    mHandler.sendEmptyMessageDelayed(SmartConnectContants.RESTORE_UI_BUTTON, 3000);
+                    break;
+                }
+                case SmartConnectContants.RESTORE_UI_BUTTON:{
+                    if (mBoolGetpicture) {
+                        mBoolGetpicture = false;
+                        mButtonGetPicture.setEnabled(true);
+                        mButtonGetPicture.getBackground().setAlpha(255);
+                    }
+                    if (mBoolGettemperature) {
+                        mBoolGettemperature = false;
+                        mButtonGetTemperature.setEnabled(true);
+                        mButtonGetTemperature.getBackground().setAlpha(255);
+                    }
+                }
+            }
+        }
+    };
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.ButtonGetPicture: {
                 if (mTcpClient != null) {
-                    mTcpClient.sendMessage("get temperature");
+                    mTcpClient.sendMessage("getpicture");
                 }
+                mBoolGetpicture = true;
+                mHandler.sendEmptyMessage(SmartConnectContants.UPDATE_UI_BUTTON);
                 break;
             }
             case R.id.ButtonGetTemperature:{
                 if (mTcpClient != null) {
-                    mTcpClient.sendMessage("get temperature");
+                    mTcpClient.sendMessage("gettemperature");
                 }
+                mBoolGettemperature = true;
+                mHandler.sendEmptyMessage(SmartConnectContants.UPDATE_UI_BUTTON);
                 break;
             }
         }
     }
+
 
 
 
@@ -149,23 +195,34 @@ public class PlugActivity extends Activity implements View.OnClickListener{
             }
 
             //in the arrayList we add the messaged received from server
-           Toast.makeText(PlugActivity.this, values[0], Toast.LENGTH_SHORT).show();
+            Log.d(TAG, "Tcp receive:" + values[0]);
+           //Toast.makeText(PlugActivity.this, values[0], Toast.LENGTH_SHORT).show();
             // notify the adapter that the data set has changed. This means that new message received
             // from server was added to the list
+        }
+
+        @Override
+        protected void onPostExecute(TCPClient result){
+            super.onPostExecute(result);
+            Log.d(TAG, "In on post execute");
+            if (result != null && result.isRunning()){
+                result.stopClient();
+            }
         }
     }
     @Override
     protected void onStop() {
         super.onStop();
         if (mTcpClient != null) {
+            mTcpClient.stopClient();
             mTcpClient.out.close();
             try {
                 mTcpClient.in.close();
             } catch (Exception e) {
                 Log.e(TAG, "cancel error");
             }
+            mTcpClient.closeSocket();
         }
 //        System.exit(RESULT_OK);
-        mTcpClient.stopClient();
     }
 }

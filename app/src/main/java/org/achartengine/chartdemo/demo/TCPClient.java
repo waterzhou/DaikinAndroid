@@ -15,6 +15,7 @@ public class TCPClient {
     public static int SERVERPORT;
     private OnMessageReceived mMessageListener = null;
     private boolean mRun = false;
+    private Socket socket;
 
     PrintWriter out;
     BufferedReader in;
@@ -26,6 +27,8 @@ public class TCPClient {
         mMessageListener = listener;
         SERVERIP = IP;
         SERVERPORT = port;
+        socket = null;
+        out = null;
     }
 
     /**
@@ -42,7 +45,9 @@ public class TCPClient {
     public void stopClient(){
         mRun = false;
     }
-
+    public boolean isRunning(){
+        return mRun;
+    }
     public void run() {
 
         mRun = true;
@@ -52,24 +57,21 @@ public class TCPClient {
             //here you must put your computer's IP address.
             InetAddress serverAddr = InetAddress.getByName(SERVERIP);
             //create a socket to make the connection with the server
-            Socket socket = new Socket(serverAddr, SERVERPORT);
+            socket = new Socket(serverAddr, SERVERPORT);
             try {
-
                 //send the message to the server
                 out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
-                Log.d(TAG, "Sent is done");
                 //receive the message which the server sends back
                 in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                Log.d(TAG, "In and out is created");
                 //in this while the client listens for the messages sent by the server
                 while (mRun) {
                     serverMessage = in.readLine();
-
                     if (serverMessage != null && mMessageListener != null) {
                         //call the method messageReceived from MyActivity class
                         mMessageListener.messageReceived(serverMessage);
                     }
                     serverMessage = null;
-
                 }
 
                 Log.d(TAG, "S: Received Message: '" + serverMessage + "'");
@@ -81,6 +83,9 @@ public class TCPClient {
             } finally {
                 //the socket must be closed. It is not possible to reconnect to this socket
                 // after it is closed, which means a new socket instance has to be created.
+                out.flush();
+                out.close();
+                in.close();
                 socket.close();
             }
 
@@ -91,7 +96,17 @@ public class TCPClient {
         }
 
     }
-
+    public void closeSocket()
+    {
+        if(socket != null) {
+            try {
+                socket.close();
+            } catch(Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+    }
     //Declare the interface. The method messageReceived(String message) will must be implemented in the MyActivity
     //class at on asynckTask doInBackground
     public interface OnMessageReceived {

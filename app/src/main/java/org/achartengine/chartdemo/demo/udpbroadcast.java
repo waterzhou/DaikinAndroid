@@ -1,7 +1,6 @@
 package org.achartengine.chartdemo.demo;
 
 import android.util.Log;
-
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -11,6 +10,7 @@ import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+
 
 /**
  * Created by water.zhou on 10/20/2014.
@@ -62,6 +62,12 @@ public abstract class udpbroadcast {
         Log.d(TAG,"close()");
         stopReceive();
         if (socket != null) {
+            try {
+                Thread.sleep(200);
+            } catch (Exception e)
+            {
+                Log.d(TAG,"Thread sleep error");
+            }
             socket.close();
         }
     }

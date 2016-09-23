@@ -33,6 +33,7 @@ import android.widget.Toast;
 
 import org.achartengine.chartdemo.demo.utils.SmartConnectUtils;
 
+import java.io.IOException;
 import java.net.DatagramPacket;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -222,15 +223,7 @@ public class ChartDemo extends Activity {
                             mAppPreferences.setParameter(tmp_ssid, packet.getAddress().toString().substring(1));
                             ItemDetails item_details = new ItemDetails();
                             item_details.setName(tmp_ssid);
-                            if (packet.getData()[1] == 1) {
-                                item_details.setItemDescription("Personal weather station");
-                                if (packet.getData()[11] == 2) {
-                                    item_details.setPrice("Location: office");
-                                } else if (packet.getData()[11] == 3){
-                                    item_details.setPrice("Location: toilet");
-                                }
-                                item_details.setImageNumber(1);
-                            }
+
                             if (packet.getData()[1] == 2) {
                                 item_details.setItemDescription("air conditon");
                                 if (packet.getData()[11] == 2) {
@@ -240,24 +233,7 @@ public class ChartDemo extends Activity {
                                 }
                                 item_details.setImageNumber(2);
                             }
-                            if (packet.getData()[1] == 4) {
-                                item_details.setItemDescription("E-Scale");
-                                if (packet.getData()[11] == 2) {
-                                    item_details.setPrice("Location: office");
-                                } else if (packet.getData()[11] == 3){
-                                    item_details.setPrice("Location: toilet");
-                                }
-                                item_details.setImageNumber(3);
-                            }
-                            if (packet.getData()[1] == 5) {
-                                item_details.setItemDescription("E-Plug");
-                                if (packet.getData()[11] == 2) {
-                                    item_details.setPrice("Location: office");
-                                } else if (packet.getData()[11] == 3){
-                                    item_details.setPrice("Location: toilet");
-                                }
-                                item_details.setImageNumber(4);
-                            }
+
                             image_details.add(item_details);
 
                             Message msg = mHandler.obtainMessage(AddNode);
@@ -308,7 +284,11 @@ public class ChartDemo extends Activity {
     @Override
     protected void onStop() {
         mHandler.removeMessages(START_SEARCH);
-        udpBroadcast.close();
+        try {
+            udpBroadcast.close();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
         super.onStop();
     }
 
